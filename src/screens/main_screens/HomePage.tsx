@@ -1,57 +1,91 @@
-import { Button, Alert, TextInput } from "react-native";
-import React, {useState, useEffect} from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { link } from 'fs';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Platform, View, Text, StyleSheet, Button } from 'react-native';
+import { create, open, dismissLink, LinkSuccess, LinkExit, LinkIOSPresentationStyle, LinkLogLevel } from 'react-native-plaid-link-sdk';
 
+var styles = require('./style');
 
+const HomeScreen = ({ route, navigation }: any) => {
+  const [linkToken, setLinkToken] = useState(null);
+  const address = Platform.OS === 'ios' ? 'localhost' : '10.0.2.2';
+  const {userInfo} = route.params;
 
-
-export default function HomePage() {
-    const [linkToken, setLinkToken] = useState('');
-
-  // Fetch the link token when the component renders
-  useEffect(() => {
-    const fetchLinkToken = async () => {
-      try {
-        const response = await fetch('http://localhost:5001/users/create_link_token', {
-          method: 'POST', // Make sure this matches your backend route
-          headers: {
-            'Content-Type': 'application/json', // You may not even need this if there is no body data
-          },
-          // No need to include body if the API doesn't require it
-        });
-
-        const data = await response.json();
+  const createLinkToken = useCallback(async () => {
+    await fetch(`http://localhost:5001/users/create_link_token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ address: address })
+    })
+      .then((response) => response.json())
+      .then((data) => {
         setLinkToken(data.link_token);
-      } catch (error) {
-        console.error('Error fetching link token:', error);
-      }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [setLinkToken]);
+
+  useEffect(() => {
+    if (linkToken == null) {
+      createLinkToken();
+    } else {
+      const tokenConfiguration = createLinkTokenConfiguration(linkToken);
+      create(tokenConfiguration);
+    }
+  }, [linkToken]);
+
+  const createLinkTokenConfiguration = (token: string, noLoadingState: boolean = false) => {
+    return {
+      token: token,
+      noLoadingState: noLoadingState,
     };
+  };
 
-    fetchLinkToken();
-  }, []);
+  const createLinkOpenProps = () => {
+    return {
+      onSuccess: async (success: LinkSuccess) => {
+        await fetch(`http://localhost:5001/users/exchange_public_token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ uid: userInfo.uid, public_token: success.publicToken }),
+        })
+          .catch((err) => {
+            console.log(err);
+          });
+        //navigation.navigate('Success', success);
+        console.log("hiphiphoray");
+      },
+      onExit: (linkExit: LinkExit) => {
+        console.log('Exit: ', linkExit);
+        dismissLink();
+      },
+      iOSPresentationStyle: LinkIOSPresentationStyle.MODAL,
+      logLevel: LinkLogLevel.ERROR,
+    };
+  };
 
-  
+  const handleOpenLink = () => {
+    const openProps = createLinkOpenProps();
+    open(openProps);
+  };
 
-  
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the HomePage</Text>
-      <Button title="connect a bank" onPress={() => console.log("button pressed")}/>
-      <Text>Your PLaid link toekn is: {linkToken}</Text>
+    <View style={{ flex: 1 }}>
+      <View style={styles.heading}>
+        <Text style={styles.titleText}>Tiny Quickstart – React Native</Text>
+      </View>
+      <View style={styles.bottom}>
+        <Button
+          title="Open Link"
+          onPress={handleOpenLink}
+        />
+      </View>
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F0F0F0",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});
+export default HomeScreen;

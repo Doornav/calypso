@@ -31,7 +31,7 @@ export default function UserLogin() {
           setLoading(false);
           Alert.alert("Success", "Login successful!");
           console.log("User Info:", data.user); // Log or use the user information
-        navigation.navigate('HomePage');
+        navigation.navigate('HomePage', {userInfo: data.user});
         } else {
           setLoading(false);
           Alert.alert("Login Errodasfasdfr", data.error || "Login failed. Please try again.");

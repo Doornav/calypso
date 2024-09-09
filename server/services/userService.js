@@ -16,6 +16,20 @@ async function addUser(uid, email, name) {
   }
 }
 
+//store access token
+async function updateAccessToken(uid, accessToken) {
+  const query = 'UPDATE user_acc SET access_token = $1 WHERE uid = $2 RETURNING *';
+  const values = [accessToken, uid];
+
+  try {
+    const res = await pool.query(query, values);
+    return res.rows[0]; // Return the updated row
+  } catch (err) {
+    console.error('Error updating access token:', err);
+    throw err;
+  }
+}
+
 //login to existing user
 async function loginUser(email, password) {
   try {
@@ -44,4 +58,4 @@ async function getUserByUid(uid) {
 }
 
 
-module.exports = { addUser, loginUser, getUserByUid };
+module.exports = { addUser, loginUser, getUserByUid, updateAccessToken };

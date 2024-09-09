@@ -1,9 +1,9 @@
 // /server/routes/userRoutes.js
 const express = require('express');
-const { addUser, loginUser, getUserByUid } = require('../services/userService');
+const { addUser, loginUser, getUserByUid, updateAccessToken } = require('../services/userService');
 const { auth } = require('../firebaseConfig'); // Import Firebase Auth from JS file
 const { createUserWithEmailAndPassword } = require('firebase/auth');
-const plaid = require('plaid');
+const {Configuration, PlaidApi, PlaidEnvironments} = require('plaid');
 require('dotenv').config();
 
 
@@ -52,18 +52,18 @@ router.post('/login', async (req, res) => {
 
 
   //PLAID LINK TOKEN
-
-  const config = new plaid.Configuration({
-    basePath: plaid.PlaidEnvironments.sandbox,
+  const config = new Configuration({
+    basePath: PlaidEnvironments[process.env.PLAID_ENV],
     baseOptions: {
       headers: {
         'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
         'PLAID-SECRET': process.env.PLAID_SECRET,
+        'Plaid-Version': '2020-09-14',
       },
     },
   });
   
-  const client = new plaid.PlaidApi(config);
+  const client = new PlaidApi(config);
 
   
   router.post('/create_link_token', async (req, res) => {
@@ -73,9 +73,10 @@ router.post('/login', async (req, res) => {
           client_user_id: 'liz', // A unique identifier for the current user
         },
         client_name: 'calypso',
+        language: 'en',
         products: ['auth', 'transactions'],
         country_codes: ['US'],
-        language: 'en',
+        redirect_uri: 'https://cdn-testing.plaid.com/link/v2/stable/sandbox-oauth-a2a-react-native-redirect.html',
       });
   
       // Log the full response from Plaid
@@ -89,6 +90,36 @@ router.post('/login', async (req, res) => {
     } catch (error) {
       console.error('Error creating link token:', error.response ? error.response.data : error.message);
       res.status(500).json({ error: 'Failed to create Plaid link token' });
+    }
+  });
+
+  router.post('/exchange_public_token', async (req, res) => {
+    const { uid, public_token } = req.body; // The public token from the frontend
+
+    if (!uid || !public_token) {
+      return res.status(400).json({ error: 'Missing uid or public_token' });
+    }
+
+    try {
+      // Exchange the public token for an access token
+      const response = await client.itemPublicTokenExchange({
+        public_token: public_token,
+      });
+  
+      const accessToken = response.data.access_token;
+      const itemId = response.data.item_id;
+      
+      try{
+        const result = await updateAccessToken(uid, accessToken);
+        console.log(result)
+      } catch (error){
+        console.error('Error updating database with access token', error)
+      }
+      // Respond with the access token and item ID
+      res.json({ access_token: accessToken, item_id: itemId });
+    } catch (error) {
+      console.error('Error exchanging public token:', error.response ? error.response.data : error.message);
+      res.status(500).json({ error: 'Failed to exchange public token' });
     }
   });
   

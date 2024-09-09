@@ -8,7 +8,7 @@ require Pod::Executable.execute_command('node', ['-p',
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, min_ios_version_supported
+platform :ios, '14.0'
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -25,6 +25,8 @@ target 'calypso' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+  
 
   target 'calypsoTests' do
     inherit! :complete

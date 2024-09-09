@@ -32,7 +32,7 @@ export default function UserSignup() {
       if (response.ok) {
         Alert.alert('Success', 'User registered successfully!');
         console.log("User Info:", data.user); // Log or use the user information
-        navigation.navigate('HomePage')
+        navigation.navigate('HomePage', {userInfo: data.user})
       } else {
         Alert.alert('Signup Error', data.error || 'Unknown error occurred.');
       }
