@@ -15,6 +15,9 @@
 		3964C9E17024ACE1E80135C4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A759A3F7A2FEDBF4AEB6777F /* PrivacyInfo.xcprivacy */; };
 		7699B88040F8A987B510C191 /* libPods-calypso-calypsoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-calypso-calypsoTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		FBA514A9532D4DA3BCC3BB6C /* Merriweather Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D658FD5E90448EBA829FCCB /* Merriweather Regular.ttf */; };
+		9B48985B2D274C1BA7B32D7C /* Merriweather Sans.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 190E3C4EAE904B1EA9844DD9 /* Merriweather Sans.ttf */; };
+		47086628BA6D43D1913FFEEB /* Merriweather Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 011B415664D74B5F98DE3FA8 /* Merriweather Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +51,9 @@
 		89C6BE57DB24E9ADA2F236DE /* Pods-calypso-calypsoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calypso-calypsoTests.release.xcconfig"; path = "Target Support Files/Pods-calypso-calypsoTests/Pods-calypso-calypsoTests.release.xcconfig"; sourceTree = "<group>"; };
 		A759A3F7A2FEDBF4AEB6777F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = calypso/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		7D658FD5E90448EBA829FCCB /* Merriweather Regular.ttf */ = {isa = PBXFileReference; name = "Merriweather Regular.ttf"; path = "../src/assets/fonts/Merriweather Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		190E3C4EAE904B1EA9844DD9 /* Merriweather Sans.ttf */ = {isa = PBXFileReference; name = "Merriweather Sans.ttf"; path = "../src/assets/fonts/Merriweather Sans.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		011B415664D74B5F98DE3FA8 /* Merriweather Bold.ttf */ = {isa = PBXFileReference; name = "Merriweather Bold.ttf"; path = "../src/assets/fonts/Merriweather Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +135,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				3119D6DFE40C42E3A2E484C1 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -154,6 +161,17 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		3119D6DFE40C42E3A2E484C1 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				7D658FD5E90448EBA829FCCB /* Merriweather Regular.ttf */,
+				190E3C4EAE904B1EA9844DD9 /* Merriweather Sans.ttf */,
+				011B415664D74B5F98DE3FA8 /* Merriweather Bold.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -251,6 +269,9 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3964C9E17024ACE1E80135C4 /* PrivacyInfo.xcprivacy in Resources */,
+				FBA514A9532D4DA3BCC3BB6C /* Merriweather Regular.ttf in Resources */,
+				9B48985B2D274C1BA7B32D7C /* Merriweather Sans.ttf in Resources */,
+				47086628BA6D43D1913FFEEB /* Merriweather Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -602,7 +623,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -675,7 +699,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

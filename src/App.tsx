@@ -9,16 +9,18 @@ import LandingPage from './screens/LandingPage';
 import UserNav from './screens/auth_screens/UserNav';
 import UserSignup from './screens/auth_screens/UserSignup';
 import HomePage from './screens/main_screens/HomePage';
+import LinkAccount from './screens/auth_screens/LinkAccount';
 const Stack = createNativeStackNavigator();
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="LandingPage">
+      <Stack.Navigator initialRouteName="LandingPage" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="LandingPage" component={LandingPage} />
         <Stack.Screen name="UserNav" component={UserNav} />
         <Stack.Screen name="UserLogin" component={UserLogin} />
         <Stack.Screen name="UserSignup" component={UserSignup} />
         <Stack.Screen name="HomePage" component={HomePage} />
+        <Stack.Screen name="LinkAccount" component={LinkAccount} />
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -1,8 +1,9 @@
-import { Button, Alert, TextInput } from "react-native";
+import { Button, Alert, TextInput, TouchableOpacity } from "react-native";
 import React, {useState} from "react";
+import { Image } from "react-native";
 import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import colors from "../../assets/constants/colors";
 
 
 export default function UserLogin() {
@@ -49,38 +50,93 @@ export default function UserLogin() {
     
 
     <View style={styles.container}>
-      <Text>Welcome to the Login Page!</Text>
+      <TouchableOpacity style={styles.topLeftButton} onPress={() => navigation.navigate('UserNav')}>
+      <Image source={require('../../assets/images/back_button.png')} />
+      </TouchableOpacity>
+      <Text style={styles.title}>Welcome to Calypso</Text>
+      <Text style={styles.subtitle}>Track all your financials</Text>
       <TextInput 
        style={styles.input} 
        value={email}
        onChangeText={setEmail} 
-       placeholder={'email'}
+       placeholder={'Email address'}
        />
        <TextInput
        style={styles.input} 
        value={password}
        onChangeText={setPassword} 
-       placeholder={'password'}
+       placeholder={'Password'}
        secureTextEntry = {true}
        />
-       <Button title={loading ? "Logging in..." : "Login"} onPress={handleLogin}/>
-       <Button title={"new user? click here to signup"} onPress={() => navigation.navigate('UserSignup')}/>
+       <TouchableOpacity style={styles.button}onPress={handleLogin}>
+      <Text style={styles.buttonText}>Log in to account</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => navigation.navigate('UserSignup')}>
+      <Text style={styles.secondaryButton}>New to Calypso?</Text>
+    </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  topLeftButton: {
+    alignSelf: 'flex-start',
+    marginStart: 30,
+    marginTop: -230,
+    marginBottom: 70,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F0F0F0",
+    backgroundColor: colors.background,
   },
   input: {
-    height: 40,
-    borderColor: "#ccc",
+    height: 60,
+    width: 340,
+    borderColor: "#828282",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 20,
     paddingHorizontal: 10,
+    marginVertical: 8,
+    fontFamily: 'Merriweather Sans',
   },
+  title: {
+    fontFamily: 'Merriweather Bold',
+    fontSize: 32,
+    color: colors.textPrimary,
+    marginBottom: 10,
+    marginTop: -10,
+  },
+  subtitle: {
+    fontFamily: 'Merriweather Sans',
+    fontSize: 17,
+    color: colors.textTertiary,
+    marginBottom: 40,
+  },
+  button: {
+    backgroundColor: colors.primary,  // Red color similar to the one in the image
+    borderRadius: 20,  // Rounded edges
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    width: 340,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 10,
+    marginTop: 30,
+    marginBottom: 30,
+  },
+  buttonText: {
+    color: 'white',  // White text
+    fontSize: 17,
+    fontFamily: 'Merriweather Bold'
+    
+  },
+  secondaryButton: {
+    fontSize: 17,
+    color: colors.textSecondary,
+    fontFamily: 'Merriweather Sans',
+    
+  }
 });

@@ -1,7 +1,9 @@
-import { Button, Alert, TextInput } from "react-native";
+import { Button, Alert, TextInput, TouchableOpacity } from "react-native";
 import React, {useState} from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import colors from "../../assets/constants/colors";
 
 
 export default function UserSignup() {
@@ -32,7 +34,7 @@ export default function UserSignup() {
       if (response.ok) {
         Alert.alert('Success', 'User registered successfully!');
         console.log("User Info:", data.user); // Log or use the user information
-        navigation.navigate('HomePage', {userInfo: data.user})
+        navigation.navigate('LinkAccount', {userInfo: data.user})
       } else {
         Alert.alert('Signup Error', data.error || 'Unknown error occurred.');
       }
@@ -45,7 +47,11 @@ export default function UserSignup() {
 
   return (
     <View style={styles.container}>
-      <Text>Welcome to Signup!</Text>
+      <TouchableOpacity style={styles.topLeftButton} onPress={() => navigation.navigate('UserNav')}>
+      <Image source={require('../../assets/images/back_button.png')} />
+      </TouchableOpacity>
+      <Text style={styles.title}>Create an account</Text>
+      <Text style={styles.subtitle}>Track all your financials</Text>
       <TextInput
         style={styles.input}
         value={name}
@@ -65,24 +71,75 @@ export default function UserSignup() {
         placeholder={'Password'}
         secureTextEntry={true}
       />
-      <Button title={loading ? "Signing up..." : "Sign Up"} onPress={handleSignup} />
-      <Button title="Already have an account? Login here" onPress={() => navigation.navigate('UserLogin')} />
+      <TouchableOpacity onPress={handleSignup} style={styles.button}>
+      <Text style={styles.buttonText}>create account</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => navigation.navigate('UserLogin')}>
+      <Text style={styles.secondaryButton}>Already have an account?</Text>
+    </TouchableOpacity>
+      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  topLeftButton: {
+    alignSelf: 'flex-start',
+    marginStart: 30,
+    marginTop: -140,
+    marginBottom: 70,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F0F0F0",
+    backgroundColor: colors.background,
   },
   input: {
-    height: 40,
-    borderColor: "#ccc",
+    height: 60,
+    width: 340,
+    borderColor: "#828282",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 20,
     paddingHorizontal: 10,
+    marginVertical: 8,
+    fontFamily: 'Merriweather Sans',
   },
+  title: {
+    fontFamily: 'Merriweather Bold',
+    fontSize: 34,
+    color: colors.textPrimary,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontFamily: 'Merriweather Sans',
+    fontSize: 17,
+    color: colors.textTertiary,
+    marginBottom: 40,
+  },
+  button: {
+    backgroundColor: colors.primary,  // Red color similar to the one in the image
+    borderRadius: 20,  // Rounded edges
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    width: 340,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 10,
+    marginTop: 30,
+    marginBottom: 30,
+  },
+  buttonText: {
+    color: 'white',  // White text
+    fontSize: 17,
+    fontFamily: 'Merriweather Bold'
+    
+  },
+  secondaryButton: {
+    fontSize: 17,
+    color: colors.textSecondary,
+    fontFamily: 'Merriweather Sans',
+    
+  }
 });
