@@ -11,7 +11,7 @@ export default function UserNav() {
     <View style={styles.container}>
       <Image source={require('../../assets/images/usernavpic.png')} />
       
-      <Text style={styles.title}>What is Calypso?</Text>
+      <Text style={styles.title}>Welcome to Calypso</Text>
       <Text style={styles.body}>Calypso is a mobile investment solution that allows you to monitor and share your financial assets across multiple different institutions</Text>
       <TouchableOpacity onPress={() => navigation.navigate('UserSignup')} style={styles.button}>
       <Text style={styles.buttonText}>Create account</Text>
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   title: {
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: "bold",
     fontFamily: "Merriweather Bold"
   },
