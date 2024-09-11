@@ -4,10 +4,11 @@ import { Image } from "react-native";
 import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import colors from "../../assets/constants/colors";
-
+import { useAuth } from "../../AuthContext";
 
 export default function UserLogin() {
     const navigation = useNavigation();
+    const { setUserInfo, setAuthToken } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,7 +33,9 @@ export default function UserLogin() {
           setLoading(false);
           Alert.alert("Success", "Login successful!");
           console.log("User Info:", data.user); // Log or use the user information
-        navigation.navigate('HomePage', {userInfo: data.user});
+          setUserInfo(data.user);
+          setAuthToken(data.authToken);
+          navigation.navigate('MainApp');
         } else {
           setLoading(false);
           Alert.alert("Login Errodasfasdfr", data.error || "Login failed. Please try again.");
@@ -74,6 +77,9 @@ export default function UserLogin() {
     <TouchableOpacity onPress={() => navigation.navigate('UserSignup')}>
       <Text style={styles.secondaryButton}>New to Calypso?</Text>
     </TouchableOpacity>
+    <TouchableOpacity onPress={() => navigation.navigate('ForgotPass')}>
+      <Text style={styles.secondaryButton2}>Forgot Password?</Text>
+    </TouchableOpacity>
     </View>
   );
 }
@@ -82,7 +88,7 @@ const styles = StyleSheet.create({
   topLeftButton: {
     alignSelf: 'flex-start',
     marginStart: 30,
-    marginTop: -230,
+    marginTop: -210,
     marginBottom: 70,
   },
   container: {
@@ -137,6 +143,14 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: colors.textSecondary,
     fontFamily: 'Merriweather Sans',
+    
+    
+  },
+  secondaryButton2: {
+    fontSize: 17,
+    color: colors.textSecondary,
+    fontFamily: 'Merriweather Sans',
+    marginTop: 15,
     
   }
 });

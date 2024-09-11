@@ -56,7 +56,7 @@ const LinkAccount = ({ route, navigation }: any) => {
           .catch((err) => {
             console.log(err);
           });
-        navigation.navigate('HomePage', {userInfo});
+        navigation.navigate('MainApp', {userInfo});
         
       },
       onExit: (linkExit: LinkExit) => {
@@ -87,7 +87,7 @@ const LinkAccount = ({ route, navigation }: any) => {
     <TouchableOpacity onPress={handleOpenLink} style={styles.button}>
     <Text style={styles.buttonText}>Connect accounts</Text>
   </TouchableOpacity>
-  <TouchableOpacity onPress={() => navigation.navigate('HomePage', {userInfo: userInfo})}>
+  <TouchableOpacity onPress={() => navigation.navigate('MainApp', {userInfo: userInfo})}>
     <Text style={styles.secondaryButton}>Skip for now</Text>
   </TouchableOpacity>
   </View>

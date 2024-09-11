@@ -1,13 +1,68 @@
 // /server/routes/userRoutes.js
 const express = require('express');
 const { addUser, loginUser, getUserByUid, updateAccessToken } = require('../services/userService');
-const { auth } = require('../firebaseConfig'); // Import Firebase Auth from JS file
-const { createUserWithEmailAndPassword } = require('firebase/auth');
+const { auth, admin } = require('../firebaseConfig'); // Import Firebase Auth from JS file
+const { createUserWithEmailAndPassword, sendPasswordResetEmail } = require('firebase/auth');
 const {Configuration, PlaidApi, PlaidEnvironments} = require('plaid');
+
 require('dotenv').config();
 
 
 const router = express.Router();
+
+//forgotpassword route
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  console.log('Request body:', req.body);
+  if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+  }
+
+  try {
+      // Initialize Firebase Auth
+    
+
+      // Send password reset email
+      await sendPasswordResetEmail(auth, email); // Pass email directly, not as JSON string
+      res.status(200).json({ message: 'Password reset email sent successfully' });
+  } catch (error) {
+      console.error('Error sending password reset email:', error.message);
+      res.status(500).json({ error: 'Failed to send password reset email' });
+  }
+});
+
+//change password route
+router.post('/change-password', async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body;
+  const authToken = req.headers.authorization?.split('Bearer ')[1];
+
+  if (!authToken) {
+      return res.status(401).json({ error: 'No authorization token provided' });
+  }
+
+  try {
+      // Verify the Firebase authentication token
+      const decodedToken = await admin.auth().verifyIdToken(authToken);
+      const uidFromToken = decodedToken.uid;
+
+      // Ensure that the user making the request is the same user whose password is being changed
+      if (uidFromToken !== userId) {
+          return res.status(403).json({ error: 'Unauthorized: User ID does not match the token' });
+      }
+
+      // Now change the user's password using Firebase Admin SDK
+      await admin.auth().updateUser(userId, {
+          password: newPassword,
+      });
+
+      res.status(200).json({ message: 'Password changed successfully' });
+  } catch (error) {
+      console.error('Error changing password:', error);
+      res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
 
 // Signup route
 router.post('/signup', async (req, res) => {
@@ -38,12 +93,14 @@ router.post('/login', async (req, res) => {
   
     try {
       // Authenticate the user with Firebase
-      const user = await loginUser(email, password);
+      const userCredential = await loginUser(email, password);
       
       // Get user information from PostgreSQL using the Firebase UID
-      const userInfo = await getUserByUid(user.uid);
+      const userInfo = await getUserByUid(userCredential.uid);
       
-      res.status(200).json({ message: 'Login successful', user: userInfo });
+      const authToken = await userCredential.getIdToken();
+
+      res.status(200).json({ message: 'Login successful', user: userInfo, authToken: authToken  });
     } catch (error) {
       console.error('Login failed:', error);
       res.status(401).json({ error: 'Login failed. Invalid credentials or user not found.' });
