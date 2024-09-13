@@ -26,6 +26,7 @@ export default function ForgotPass() {
     
             if (response.ok) {
                 console.log('Password reset email sent successfully:', data.message);
+                Alert.alert('Password recovery email sent');
                 navigation.navigate('UserLogin');
                 // Show success message to the user
             } else {

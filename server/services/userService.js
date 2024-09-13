@@ -25,8 +25,21 @@ async function updateAccessToken(uid, accessToken) {
     const res = await pool.query(query, values);
     return res.rows[0]; // Return the updated row
   } catch (err) {
-    console.error('Error updating access token:', err);
-    throw err;
+    const res = await pool.query(query, values);
+    return res.rows[0];
+  }
+}
+
+async function updateName(uid, newName) {
+  const query = 'UPDATE user_acc SET name = $1 WHERE uid = $2 RETURNING *';
+  const values = [newName, uid];
+
+  try {
+    const res = await pool.query(query, values);
+    return res.rows[0];
+  } catch (error) {
+    const res = await pool.query(query, values);
+    return res.rows[0];
   }
 }
 
@@ -42,7 +55,7 @@ async function loginUser(email, password) {
 
 // Function to get user information by UID
 async function getUserByUid(uid) {
-  const query = 'SELECT uid, email, name, created_at FROM user_acc WHERE uid = $1';
+  const query = 'SELECT uid, access_token, email, name, created_at FROM user_acc WHERE uid = $1';
   const values = [uid];
 
   try {
@@ -58,4 +71,4 @@ async function getUserByUid(uid) {
 }
 
 
-module.exports = { addUser, loginUser, getUserByUid, updateAccessToken };
+module.exports = { addUser, loginUser, getUserByUid, updateAccessToken, updateName };

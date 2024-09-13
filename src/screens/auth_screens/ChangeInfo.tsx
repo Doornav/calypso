@@ -6,7 +6,7 @@ import { useAuth } from '../../AuthContext';
 
 
 const ChangeInfo = ({ route, navigation }: any) => {
-    const { userInfo, authToken } = useAuth();
+    const { userInfo, authToken, setUserInfo } = useAuth();
     const {infoType} = route.params;
     const userId = userInfo?.uid; 
 
@@ -15,6 +15,11 @@ const ChangeInfo = ({ route, navigation }: any) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [text, setText] = useState(userInfo?.[infoType] || '');
     const [loading, setLoading] = useState(false);
+
+
+    const handleChangeName = (newName: string) => {
+        setUserInfo({ name: newName}); // Update name locally
+      };
 
     const getPlaceholder = () => {
         
@@ -47,13 +52,61 @@ const ChangeInfo = ({ route, navigation }: any) => {
         if (infoType === 'password') {
             handleChangePassword();
             console.log(`Current Password: ${currentPassword}, New Password: ${newPassword}`);
+        } else if (infoType === 'name') {
+            Alert.alert(
+                "Change Name",          // Title of the alert
+                "Are you sure you want to change your username", // Message content
+                [
+                
+                  { text: "Continue", onPress: () => changeName(text, userId) },
+                  { text: "Cancel"}
+                ],
+                { cancelable: false } // Set true to dismiss on tapping outside the alert
+              );
+            
+            console.log(`Updated name: ${text}`);
         } else {
             console.log(`Updated ${infoType}: ${text}`);
         }
     };
 
-    const changePassword = async (currentPassword: string, newPassword: string, userId: string, authToken: string) => {
+        const changeName = async (newName: string, userId: string) => {
+    
         try {
+            const response = await fetch('http://localhost:5001/users/change-name', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}` // Include auth token for authentication
+                },
+                body: JSON.stringify({
+                    userId,
+                    newName,
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to change name');
+            }
+
+            const data = await response.json();
+            console.log('Name changed successfully:', data);
+
+            Alert.alert('Success', 'Your name has been updated.');
+            handleChangeName(newName);
+            navigation.navigate('MainApp');
+            
+            return data;
+        } catch (error) {
+            console.error('Error changing name:', error);
+            Alert.alert('Error', 'Failed to change name.');
+            throw error;
+        }
+    };
+
+    const changePassword = async () => {
+        try {
+            const email = userInfo.email;
             const response = await fetch('http://localhost:5001/users/change-password', {
                 method: 'POST',
                 headers: {
@@ -63,7 +116,8 @@ const ChangeInfo = ({ route, navigation }: any) => {
                 body: JSON.stringify({
                     userId,  // Pass the userId here (instead of userInfo.uid)
                     currentPassword,
-                    newPassword
+                    newPassword,
+                    email,
                 })
             });
     
@@ -73,23 +127,48 @@ const ChangeInfo = ({ route, navigation }: any) => {
     
             const data = await response.json();
             console.log('Password changed successfully:', data);
+            Alert.alert('Success', 'Your password has been updated.');
             navigation.navigate('MainApp');
             
             return data;
         } catch (error) {
-            console.error('kbkjbkError changing password:', error);
-            throw error;
+            console.error(' changing password:', error);
+            
+            Alert.alert(
+                "Error Changing Password",          // Title of the alert
+                "Current password not correct", // Message content
+                [
+                
+                  { text: "OK", onPress: () => console.log("OK Pressed") }
+                ],
+                { cancelable: false } // Set true to dismiss on tapping outside the alert
+              );
+            throw Error;
         }
     };
     
     const handleChangePassword = async () => {
         console.log("hehhhehehe")
-        try {
-            const result = await changePassword(currentPassword, newPassword, userId, authToken);
-            console.log('Password change result:', result);
-        } catch (error) {
-            console.error('Password change failed:', error);
+
+        if(newPassword == confirmPassword){
+            try {
+                const result = await changePassword();
+                console.log('Password change result:', result);
+            } catch (error) {
+                console.error('Password change failed:', error);
+            }
+        } else {
+            Alert.alert(
+                "Error Changing Password",          // Title of the alert
+                "New passwords don't match", // Message content
+                [
+                
+                  { text: "OK", onPress: () => console.log("OK Pressed") }
+                ],
+                { cancelable: false } // Set true to dismiss on tapping outside the alert
+              );
         }
+        
     };
 
     return (

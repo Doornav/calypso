@@ -4,10 +4,10 @@ import { View, Text, StyleSheet } from "react-native";
 import { Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import colors from "../../assets/constants/colors";
-
+import { useAuth } from "../../AuthContext";
 
 export default function UserSignup() {
-   
+  const { setUserInfo, setAuthToken } = useAuth();
     const navigation = useNavigation();
 
   const [email, setEmail] = useState('');
@@ -17,7 +17,7 @@ export default function UserSignup() {
 
 
   const handleSignup = async () => {
-    console.log("asdfsf")
+   
     setLoading(true);
     try {
       const response = await fetch('http://localhost:5001/users/signup', {
@@ -34,7 +34,9 @@ export default function UserSignup() {
       if (response.ok) {
         Alert.alert('Success', 'User registered successfully!');
         console.log("User Info:", data.user); // Log or use the user information
-        navigation.navigate('LinkAccount', {userInfo: data.user});
+        setUserInfo(data.user);
+        setAuthToken(data.authToken);
+        navigation.navigate('VerifyEmail', {userInfo: data.user});
       } else {
         Alert.alert('Signup Error', data.error || 'Unknown error occurred.');
       }

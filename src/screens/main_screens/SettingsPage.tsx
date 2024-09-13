@@ -4,8 +4,35 @@ import { create, open, dismissLink, LinkSuccess, LinkExit, LinkIOSPresentationSt
 import colors from '../../assets/constants/colors';
 import { Image } from 'react-native';
 import { useAuth } from '../../AuthContext';
-const SettingsPage = ({ route, navigation }: any) => {
-  const { userInfo, authToken } = useAuth();
+import { Alert } from 'react-native';
+const SettingsPage = ({ navigation }: any) => {
+  const { userInfo, authToken, logoutUser } = useAuth();
+
+
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Confirm Logout",  // Title of the alert
+      "Are you sure you want to log out?",  // Message in the alert
+      [
+        {
+          text: "Logout",
+          onPress: () => {
+            logoutUser; // Call your logout function
+            navigation.navigate("UserNav"); // Navigate to the usernav page
+          },
+        },
+        {
+          text: "Cancel",
+          onPress: () => console.log("Logout canceled"),
+          style: "cancel",  // Styling for the cancel button (optional)
+        }
+      ],
+      { cancelable: false } // Set to true if you want the alert to close when tapping outside
+    );
+  };
+  
+
 
   console.log(userInfo);
   return (
@@ -24,12 +51,16 @@ const SettingsPage = ({ route, navigation }: any) => {
        <Text style={styles.buttonText}>Change/Forgot Password</Text>
        <Image source={require('../../assets/images/forward_btton.png')} />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('ChangeInfo' , {userInfo: userInfo, infoType : 'email'})}>
+      {/* <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('ChangeInfo' , {userInfo: userInfo, infoType : 'email'})}>
         <Text style={styles.buttonText}>Change Email</Text>
         <Image source={require('../../assets/images/forward_btton.png')} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('LinkAccount' , {userInfo: userInfo})}>
         <Text style={styles.buttonText}>Link Bank</Text>
+        <Image source={require('../../assets/images/forward_btton.png')} />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.settingsButton} onPress={handleLogout}>
+        <Text style={styles.buttonText}>Logout</Text>
         <Image source={require('../../assets/images/forward_btton.png')} />
       </TouchableOpacity>
      

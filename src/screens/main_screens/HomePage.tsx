@@ -8,7 +8,7 @@ import { useAuth } from '../../AuthContext';
 const HomeScreen = ({ route, navigation }: any) => {
   const { userInfo, authToken } = useAuth();
   const [selectedTab, setSelectedTab] = useState<number | null>(null);
-
+  const access_token = userInfo.access_token;
   const data = [
     { title: 'Investments', description: '30% return' },
     { title: 'Savings', description: '60% return' },
@@ -23,17 +23,44 @@ const HomeScreen = ({ route, navigation }: any) => {
   };
 
 
+  const handleBalance = async () => {
+    console.log("access token: " + access_token)
+
+    try {
+      const response = await fetch('http://localhost:5001/users/balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ access_token }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+
+        console.log("balance", data); // Log or use the user informatio
+      } else {
+        console.log(data.error);
+      }
+    } catch (error) {
+      console.log(error);
+  };
+
+  }
+
+
   return (
     <View style={styles.container}>
 
       <View style = {styles.header}>
-        <Text style={styles.title}>Welcome, Pranav</Text>
+        <Text style={styles.title}>Welcome, {userInfo.name}</Text>
         <View style={styles.card}>
             <Text style={styles.title3}>Your total asset portfolio</Text>
             <Text style={styles.amount}>$1,000,000</Text>
         </View>
             <Text style={styles.title2}> Your accounts</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Accounts')}>
+            <TouchableOpacity onPress={handleBalance}>
               <Text style= {styles.title4}>See All →</Text>
             </TouchableOpacity>
 

@@ -14,6 +14,7 @@ import AccountsPage from './screens/main_screens/AccountsPage';
 import SettingsPage from './screens/main_screens/SettingsPage';
 import colors from './assets/constants/colors';
 import { AuthProvider } from './AuthContext';
+import VerifyEmail from './screens/auth_screens/VerifyEmail';
 // Initialize navigators
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
@@ -78,6 +79,7 @@ const App = () => {
         <Stack.Screen name="MainApp" component={BottomTabs} />
         <Stack.Screen name="ChangeInfo" component={ChangeInfo} />
         <Stack.Screen name="ForgotPass" component={ForgotPass} />
+        <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
       </Stack.Navigator>
     </NavigationContainer>
     </AuthProvider>

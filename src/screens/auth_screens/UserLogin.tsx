@@ -31,14 +31,13 @@ export default function UserLogin() {
     
         if (response.ok) {
           setLoading(false);
-          Alert.alert("Success", "Login successful!");
           console.log("User Info:", data.user); // Log or use the user information
           setUserInfo(data.user);
           setAuthToken(data.authToken);
           navigation.navigate('MainApp');
         } else {
           setLoading(false);
-          Alert.alert("Login Errodasfasdfr", data.error || "Login failed. Please try again.");
+          Alert.alert("Login failed", data.error );
         }
       } catch (error) {
         setLoading(false);

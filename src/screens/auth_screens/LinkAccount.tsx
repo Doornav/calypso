@@ -4,11 +4,11 @@ import { Platform, View, Text, StyleSheet, TouchableOpacity } from 'react-native
 import { create, open, dismissLink, LinkSuccess, LinkExit, LinkIOSPresentationStyle, LinkLogLevel } from 'react-native-plaid-link-sdk';
 import colors from '../../assets/constants/colors';
 import { Image } from 'react-native';
-
-const LinkAccount = ({ route, navigation }: any) => {
+import { useAuth } from '../../AuthContext';
+const LinkAccount = ({ navigation }: any) => {
   const [linkToken, setLinkToken] = useState(null);
   const address = Platform.OS === 'ios' ? 'localhost' : '10.0.2.2';
-  const {userInfo} = route.params;
+  const {userInfo, authToken} = useAuth();
 
   const createLinkToken = useCallback(async () => {
     await fetch(`http://localhost:5001/users/create_link_token`, {
