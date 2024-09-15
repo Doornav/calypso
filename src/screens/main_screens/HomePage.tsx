@@ -4,27 +4,36 @@ import { Platform, View, Text, StyleSheet, Button, ScrollView, TouchableOpacity 
 import { create, open, dismissLink, LinkSuccess, LinkExit, LinkIOSPresentationStyle, LinkLogLevel } from 'react-native-plaid-link-sdk';
 import colors from '../../assets/constants/colors';
 import { useAuth } from '../../AuthContext';
+import InvestmentAccount from '../../components/InvestmentAccounts';
+import { SafeAreaView } from 'react-native';
+import DonutChart from '../../components/DonutChart';
 
 const HomeScreen = ({ route, navigation }: any) => {
   const { userInfo, authToken } = useAuth();
   const [selectedTab, setSelectedTab] = useState<number | null>(null);
   const access_token = userInfo.access_token;
-  const data = [
-    { title: 'Investments', description: '30% return' },
-    { title: 'Savings', description: '60% return' },
-    { title: 'Checking', description: '90% return' },
+
+  // Example investment data (you can replace this with actual data later)
+  const stockData = [
+    { name: 'Apple', value: 5000, color: '#DB4331' },
+    { name: 'Tesla', value: 3000, color: '#DB7D30' },
+    { name: 'Amazon', value: 2000, color: '#DB5F39' },
   ];
 
+  const totalValue = stockData.reduce((sum, stock) => sum + stock.value, 0);
 
-  console.log("userinfo on home page" + userInfo);
+  const data = [
+    { title: 'Investments', description: '30% return'  },
+    { title: 'Savings', description: '60% return'},
+    { title: 'Checking', description: '90% return' },
+  ];
 
   const handlePress = (index: number) => {
     setSelectedTab(index === selectedTab ? null : index); // Toggle the selected tab
   };
 
-
   const handleBalance = async () => {
-    console.log("access token: " + access_token)
+    console.log("access token: " + access_token);
 
     try {
       const response = await fetch('http://localhost:5001/users/balance', {
@@ -34,37 +43,31 @@ const HomeScreen = ({ route, navigation }: any) => {
         },
         body: JSON.stringify({ access_token }),
       });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
 
-        console.log("balance", data); // Log or use the user informatio
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("balance", data); // Log or use the user information
       } else {
         console.log(data.error);
       }
     } catch (error) {
       console.log(error);
+    }
   };
-
-  }
-
 
   return (
     <View style={styles.container}>
-
-      <View style = {styles.header}>
+      <View style={styles.header}>
         <Text style={styles.title}>Welcome, {userInfo.name}</Text>
         <View style={styles.card}>
-            <Text style={styles.title3}>Your total asset portfolio</Text>
-            <Text style={styles.amount}>$1,000,000</Text>
+          <Text style={styles.title3}>Your total asset portfolio</Text>
+          <Text style={styles.amount}>$1,000,000</Text>
         </View>
-            <Text style={styles.title2}> Your accounts</Text>
-            <TouchableOpacity onPress={handleBalance}>
-              <Text style= {styles.title4}>See All →</Text>
-            </TouchableOpacity>
-
-
+        <Text style={styles.title2}> Your accounts</Text>
+        <TouchableOpacity onPress={handleBalance}>
+          <Text style={styles.title4}>See All →</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -82,23 +85,31 @@ const HomeScreen = ({ route, navigation }: any) => {
             <Text style={styles.tabDescription}>{item.description}</Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>  
+      </ScrollView>
 
-  {/* Reveal Content Below */}
-  {selectedTab !== null && (
+      {/* Reveal Content Below */}
+      {selectedTab !== null && (
         <View style={styles.content}>
           <Text style={styles.contentText}>
-            {data[selectedTab].title} details go here.
+            {data[selectedTab].title} details:
           </Text>
+
+          {/* Investment Pie Chart based on selectedTab */}
+          <InvestmentAccount
+        accountName="My Investment Portfolio"
+        date="Sept 14, 2024"
+        data={stockData}
+        dailyReturn={1.75}
+      />
+
         </View>
       )}
-
-
     </View>
   );
 };
 
 export default HomeScreen;
+
 
 const styles = StyleSheet.create({
   title4: {
