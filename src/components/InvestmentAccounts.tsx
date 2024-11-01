@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import DonutChart from "./DonutChart"; // Assuming you have the DonutChart component from before
 
 interface StockData {
@@ -10,18 +11,82 @@ interface StockData {
 }
 
 interface InvestmentAccountProps {
+  accessToken: string;
   accountName: string;
-  date: string;
-  data: StockData[];
-  dailyReturn: number;
 }
 
-const InvestmentAccount: React.FC<InvestmentAccountProps> = ({
-  accountName,
-  date,
-  data,
-  dailyReturn,
-}) => {
+const InvestmentAccount: React.FC<InvestmentAccountProps> = ({ accessToken, accountName }) => {
+  const [data, setData] = useState<StockData[]>([]);
+  const [dailyReturn, setDailyReturn] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [date, setDate] = useState<string>("");
+  const access_token = userInfo.access_token;
+  useEffect(() => {
+    fetchInvestmentData();
+  }, []);
+
+  const fetchInvestmentData = async () => {
+    try {
+      const response = await fetch("http://localhost:5001/users/get_investment_data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ access_token: accessToken }),
+      });
+
+      const result = await response.json();
+      const stockData = mapHoldingsToStockData(result.holdings);
+
+      // Calculate daily return based on stock data
+      const dailyReturnValue = calculateDailyReturn(stockData);
+
+      setData(stockData);
+      setDailyReturn(dailyReturnValue);
+      setDate(new Date().toLocaleDateString());
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching investment data:", error);
+      setLoading(false);
+    }
+  };
+
+  const mapHoldingsToStockData = (holdings: any[]): StockData[] => {
+    return holdings.map((holding) => {
+      const { security } = holding;
+      const value = holding.quantity * security.close_price;
+      const change =
+        security.previous_close_price && security.previous_close_price !== 0
+          ? ((security.close_price - security.previous_close_price) / security.previous_close_price) * 100
+          : 0;
+
+      return {
+        name: security.ticker_symbol || security.name,
+        value,
+        color: getRandomColor(),
+        change: parseFloat(change.toFixed(2)),
+      };
+    });
+  };
+
+  const calculateDailyReturn = (stockData: StockData[]): number => {
+    const totalValue = stockData.reduce((sum, stock) => sum + stock.value, 0);
+    const totalChange = stockData.reduce((sum, stock) => sum + (stock.value * stock.change) / 100, 0);
+    const dailyReturnPercentage = (totalChange / totalValue) * 100;
+    return parseFloat(dailyReturnPercentage.toFixed(2));
+  };
+
+  const getRandomColor = (): string => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  if (loading) {
+    return <ActivityIndicator size="large" />;
+  }
+
   // Calculate total value
   const total = data.reduce((sum, stock) => sum + stock.value, 0);
 
@@ -59,9 +124,7 @@ const InvestmentAccount: React.FC<InvestmentAccountProps> = ({
         <Text style={styles.legendTitle}>Stock Breakdown:</Text>
         {data.map((stock, index) => (
           <View key={index} style={styles.legendItem}>
-            <View
-              style={[styles.legendColorBox, { backgroundColor: stock.color }]}
-            />
+            <View style={[styles.legendColorBox, { backgroundColor: stock.color }]} />
             <Text style={styles.legendText}>
               {stock.name}: ${stock.value.toLocaleString()} ({stock.change}%)
             </Text>
@@ -73,6 +136,9 @@ const InvestmentAccount: React.FC<InvestmentAccountProps> = ({
 };
 
 export default InvestmentAccount;
+
+// ... styles remain the same ...
+
 
 const styles = StyleSheet.create({
   container: {

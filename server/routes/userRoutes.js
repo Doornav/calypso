@@ -1,6 +1,6 @@
 // /server/routes/userRoutes.js
 const express = require('express');
-const { addUser, loginUser, getUserByUid, updateAccessToken } = require('../services/userService');
+const { addUser, loginUser, getUserByUid, insertAccessToken } = require('../services/userService');
 const { auth, admin } = require('../firebaseConfig'); // Import Firebase Auth from JS file
 const { createUserWithEmailAndPassword, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider, sendEmailVerification, getUserByEmail } = require('firebase/auth');
 const {Configuration, PlaidApi, PlaidEnvironments} = require('plaid');
@@ -218,12 +218,12 @@ router.post('/login', async (req, res) => {
   });
 
   router.post('/exchange_public_token', async (req, res) => {
-    const { uid, public_token } = req.body; // The public token from the frontend
-
-    if (!uid || !public_token) {
-      return res.status(400).json({ error: 'Missing uid or public_token' });
+    const { uid, public_token, institution_name } = req.body; // Added institution details
+  
+    if (!uid || !public_token || !institution_name) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
-
+  
     try {
       // Exchange the public token for an access token
       const response = await client.itemPublicTokenExchange({
@@ -232,13 +232,17 @@ router.post('/login', async (req, res) => {
   
       const accessToken = response.data.access_token;
       const itemId = response.data.item_id;
-      
-      try{
-        const result = await updateAccessToken(uid, accessToken);
-        console.log(result)
-      } catch (error){
-        console.error('Error updating database with access token', error)
+      console.log("THIS IS THE ITEMID: ", itemId);
+  
+      // Store accessToken, itemId, institutionId, and institutionName in the database
+      try {
+        const result = await insertAccessToken(uid, accessToken, itemId, institution_name);
+        console.log(result);
+      } catch (error) {
+        console.error('Error updating database with access token', error);
+        return res.status(500).json({ error: 'Database update failed' });
       }
+  
       // Respond with the access token and item ID
       res.json({ access_token: accessToken, item_id: itemId });
     } catch (error) {
@@ -246,6 +250,7 @@ router.post('/login', async (req, res) => {
       res.status(500).json({ error: 'Failed to exchange public token' });
     }
   });
+  
 
 
   //CHANGE NAME ROUTE
@@ -331,6 +336,40 @@ router.post('/balance', async (req, res) => {
   }
 });
 
+
+router.post('/get_investment_data', async (req, res) => {
+  const { access_token } = req.body;
+
+  if (!access_token) {
+    return res.status(400).json({ error: 'Missing access_token' });
+  }
+
+  try {
+    // Fetch holdings and securities
+    const holdingsResponse = await client.getHoldings(access_token);
+    const { holdings, securities } = holdingsResponse;
+
+    // Map securities by security_id for easy lookup
+    const securitiesMap = securities.reduce((map, security) => {
+      map[security.security_id] = security;
+      return map;
+    }, {});
+
+    // Enrich holdings with security data
+    const enrichedHoldings = holdings.map((holding) => {
+      const security = securitiesMap[holding.security_id];
+      return {
+        ...holding,
+        security,
+      };
+    });
+
+    res.json({ holdings: enrichedHoldings });
+  } catch (error) {
+    console.error('Error fetching investment data:', error);
+    res.status(500).json({ error: 'Failed to fetch investment data' });
+  }
+});
 
 
   

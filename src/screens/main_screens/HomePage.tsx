@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native';
 import DonutChart from '../../components/DonutChart';
 
 const HomeScreen = ({ route, navigation }: any) => {
-  const { userInfo, authToken } = useAuth();
+  const { userInfo } = useAuth();
   const [selectedTab, setSelectedTab] = useState<number | null>(null);
   const access_token = userInfo.access_token;
 
@@ -62,7 +62,7 @@ const HomeScreen = ({ route, navigation }: any) => {
         <Text style={styles.title}>Welcome, {userInfo.name}</Text>
         <View style={styles.card}>
           <Text style={styles.title3}>Your total asset portfolio</Text>
-          <Text style={styles.amount}>$1,000,000</Text>
+          <Text style={styles.amount}>$1,000,000,000</Text>
         </View>
         <Text style={styles.title2}> Your accounts</Text>
         <TouchableOpacity onPress={handleBalance}>

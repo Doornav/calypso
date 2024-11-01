@@ -46,18 +46,29 @@ const LinkAccount = ({ navigation }: any) => {
   const createLinkOpenProps = () => {
     return {
       onSuccess: async (success: LinkSuccess) => {
+        // Extract institution details from the success object
+        const institutionName = success.metadata.institution?.name;
+  
+        // Prepare the data to send to the server
+        const data = {
+          uid: userInfo.uid,
+          public_token: success.publicToken,
+          institution_name: institutionName,
+        };
+  
+        // Send the data to the server
         await fetch(`http://localhost:5001/users/exchange_public_token`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ uid: userInfo.uid, public_token: success.publicToken }),
-        })
-          .catch((err) => {
-            console.log(err);
-          });
-        navigation.navigate('MainApp', {userInfo});
-        
+          body: JSON.stringify(data),
+        }).catch((err) => {
+          console.log(err);
+        });
+  
+        // Navigate to the main app
+        navigation.navigate('MainApp', { userInfo });
       },
       onExit: (linkExit: LinkExit) => {
         console.log('Exit: ', linkExit);
@@ -67,6 +78,7 @@ const LinkAccount = ({ navigation }: any) => {
       logLevel: LinkLogLevel.ERROR,
     };
   };
+  
 
   const handleOpenLink = () => {
     const openProps = createLinkOpenProps();
